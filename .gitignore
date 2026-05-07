@@ -1,14 +1,25 @@
-# Unit-level data files — gated behind microdata.gov.in login,
-# can't be redistributed. See README §Step 0 to fetch.
-raw/data/*.txt
-raw/data/*.TXT
-raw/data/*.zip
+# Unit-level data files — gated behind microdata.gov.in login, can't be
+# redistributed. See README → Fetch the data. .Nesstar archives are too big
+# for git anyway.
+raw/data*/*.txt
+raw/data*/*.TXT
+raw/data*/*.zip
+raw/data*/*.Nesstar
+raw/213*/
+raw/data*/Guide*.pdf
+raw/data*/*.exe
 
-# Built outputs from raw data — regenerable via scripts/parse_plfs_data.py
-clean/hhv1.csv
-clean/hhrv.csv
-clean/perv1.csv
-clean/perrv.csv
+# Built outputs from raw data — regenerable via scripts/parse_plfs_data.py.
+# Calendar-year CSVs especially are too large to commit (CY2025 cperv1.csv
+# alone is ~700MB).
+clean/annual_2023_24/hhv1.csv
+clean/annual_2023_24/hhrv.csv
+clean/annual_2023_24/perv1.csv
+clean/annual_2023_24/perrv.csv
+clean/calendar_2024/chhv1.csv
+clean/calendar_2024/cperv1.csv
+clean/calendar_2025/chhv1.csv
+clean/calendar_2025/cperv1.csv
 
 # Local scratch / OS detritus
 .DS_Store
