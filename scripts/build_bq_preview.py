@@ -553,7 +553,13 @@ python3 scripts/load_bq.py        # to be written
 
 
 def write_readme() -> None:
-    (OUT / "README.md").write_text(REVIEW_README, encoding="utf-8")
+    # The README is hand-curated (provides full context for the CTO).
+    # Only write the default template if no README exists yet — don't clobber
+    # the hand-edited version on re-runs.
+    target = OUT / "README.md"
+    if target.exists():
+        return
+    target.write_text(REVIEW_README, encoding="utf-8")
 
 
 # -------- Driver -------------------------------------------------------------
