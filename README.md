@@ -187,6 +187,8 @@ PLFS/
 │   ├── parse_nco_2015.py         ← writes codemaps/nco_*.csv from NCO PDF
 │   └── load_bq.py                ← one-shot ETL into BigQuery (6 tables)
 │
+├── schemas/                      ← BigQuery column-level docs (one YAML per table)
+│
 └── analyses/                     ← exploratory research scripts (read clean/* CSVs)
 ```
 
