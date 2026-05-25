@@ -36,11 +36,13 @@ external_data_sources/
 │   ├── schemas/
 │   ├── raw/             # source artifacts before upload (gitignored)
 │   └── .gitignore
-└── jnv/                 # JNV JEE Mains results pipeline
+└── jnv/                 # JNV JEE + NEET results pipeline
     ├── README.md
     ├── CLAUDE.md
     ├── codemaps/        # per-year column mapping configs (Python)
-    │   └── mains/
+    │   ├── mains/       # JEE Mains (2021–2026)
+    │   ├── advanced/    # JEE Advanced (2024–2025)
+    │   └── neet/        # NEET (2021–2025)
     ├── scripts/
     ├── schemas/
     ├── raw/             # source Excel files (gitignored)
@@ -123,6 +125,8 @@ Two patterns, two examples:
 - [`jnv/`](jnv/) — heavy transform with codemap-driven config. Raw Excel
   files → schema-normalised CSV → parquet → GCS → BQ. Introduces the
   codemap pattern: all year-specific column mappings live outside the
-  script, making the engine zero-config for new years.
+  engine script, making it zero-config for new years. Covers JEE Mains,
+  JEE Advanced, and NEET — two output tables: `jnv_fact_jee_results`,
+  `jnv_fact_neet_results`.
 
 See `<source>/CLAUDE.md` for the full orientation of either.

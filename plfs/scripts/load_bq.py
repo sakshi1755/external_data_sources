@@ -36,6 +36,7 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import re
 import sys
 from pathlib import Path
 from typing import Iterable
@@ -48,7 +49,7 @@ from weights import get_weight_fn, weight_rule_of
 
 CODEMAPS = ROOT / "codemaps"
 CLEAN = ROOT / "clean"
-DEFAULT_DATASET = "plfs"
+DEFAULT_DATASET = "external_data_sources"
 
 # Household join key columns. Both qtr (annual / pre-CY2025) and month (CY2025)
 # are included — exactly one is populated per row depending on release.
@@ -263,6 +264,19 @@ def _read_release_csv(path: Path) -> pd.DataFrame:
     return pd.read_csv(path, dtype=str, keep_default_na=False, na_values=[""])
 
 
+def _drop_dup_name_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Drop pandas duplicate-name artifacts.
+
+    Some clean CSVs (e.g. annual_2020_21 perv1, the migration block) carry two
+    columns with the same header; pandas read_csv suffixes the second with
+    '.1' / '.2' / …. Those dots are illegal in BigQuery column names
+    ("Character '.' found in field name … not yet supported"), so the parquet
+    fails to load. Drop the suffixed duplicates, keeping the first occurrence.
+    """
+    dups = [c for c in df.columns if re.search(r"\.\d+$", str(c))]
+    return df.drop(columns=dups) if dups else df
+
+
 def build_persons_for_release(release_id: str, labels: dict[str, dict[str, str]]) -> pd.DataFrame | None:
     """Build the persons rows for one release.  Returns None if data is missing."""
     cfg = RELEASES[release_id]
@@ -280,6 +294,7 @@ def build_persons_for_release(release_id: str, labels: dict[str, dict[str, str]]
         df["src_file"] = p.stem  # 'perv1' / 'perrv' / 'cperv1'
         frames.append(df)
     df = pd.concat(frames, ignore_index=True)
+    df = _drop_dup_name_columns(df)
 
     # ── Release-level metadata ──────────────────────────────────────────────
     df["release_id"] = release_id
@@ -348,6 +363,7 @@ def build_households_for_release(release_id: str, labels: dict[str, dict[str, st
         df["src_file"] = p.stem
         frames.append(df)
     df = pd.concat(frames, ignore_index=True)
+    df = _drop_dup_name_columns(df)
 
     df["release_id"] = release_id
     df["release_format"] = cfg["format"]
@@ -466,10 +482,10 @@ def main() -> None:
     if not args.facts_only:
         print("\n=== Dimension tables ===")
         for name, df in [
-            ("releases", build_releases_df()),
-            ("dim_nco", build_dim_nco()),
-            ("dim_nic", build_dim_nic()),
-            ("dim_geo", build_dim_geo()),
+            ("plfs_releases", build_releases_df()),
+            ("plfs_dim_nco", build_dim_nco()),
+            ("plfs_dim_nic", build_dim_nic()),
+            ("plfs_dim_geo", build_dim_geo()),
         ]:
             print(f"{name}:")
             _upload(df, tbl(name), append=False, project=args.project, dry_run_dir=dry_dir)
@@ -489,14 +505,14 @@ def main() -> None:
             print(f"  ⚠ no persons CSV found for {release_id}, skipping")
         else:
             print(f"  persons:")
-            _upload(p, tbl("persons"), append=not first, project=args.project, dry_run_dir=dry_dir)
+            _upload(p, tbl("plfs_fact_persons"), append=not first, project=args.project, dry_run_dir=dry_dir)
 
         h = build_households_for_release(release_id, labels)
         if h is None:
             print(f"  ⚠ no households CSV found for {release_id}, skipping")
         else:
             print(f"  households:")
-            _upload(h, tbl("households"), append=not first, project=args.project, dry_run_dir=dry_dir)
+            _upload(h, tbl("plfs_fact_households"), append=not first, project=args.project, dry_run_dir=dry_dir)
 
     print("\n✓ done.")
 
