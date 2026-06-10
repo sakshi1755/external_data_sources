@@ -6,9 +6,13 @@ description: >
 
 grain: (id)
 source_files:
-  single: EI_Asset_Test.xlsx  (sheet: student_scores)
+  single: "EI_Asset_Test.xlsx  (sheet: student_scores)"
 
 columns:
+  - name: test_year
+    type: constant
+    description: Year the EI ASSET assessment was conducted (always "2025" in this table).
+
   - name: id
     type: int
     description: Unique row identifier from the source file.

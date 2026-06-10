@@ -14,6 +14,7 @@ import pandas as pd
 #   "float" — nullable float (float64)
 
 COLUMN_TYPES: dict[str, str] = {
+    "test_year":                "constant",
     "id":                       "int",
     "school_identifier":        "int",
     "assetd_assessment_id":     "int",

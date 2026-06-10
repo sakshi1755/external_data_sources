@@ -55,6 +55,7 @@ def main() -> None:
     df = pd.read_excel(raw.local_path, sheet_name=raw.sheet, dtype=str)
     df = _sanitize_columns(df)
     df = df.rename(columns=COLUMN_RENAMES)
+    df.insert(0, "test_year", "2025")
     print(f"  {len(df):,} rows × {len(df.columns)} columns")
 
     out = EI_ASSET_TEST_CLEAN.local_path
