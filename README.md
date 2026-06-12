@@ -9,11 +9,11 @@ BigQuery for analysis. One folder per upstream source.
 |---|---|---|---|
 | PLFS (India) | [`plfs/`](plfs/) | Active | Periodic Labour Force Survey — MoSPI unit-level microdata across 11 releases (2018-19 → CY2025). Heavy local parsing → 6 `plfs_*` tables. |
 | NIRF (India) | [`nirf/`](nirf/) | Active | National Institutional Ranking Framework — rankings + admissions/placements/strength data, top-200 institutes across 9 disciplines, 2016-2025. Light pipeline (parquet → GCS → BQ) → 4 `nirf_fact_*` tables. |
-| JNV JEE + NEET + JNVST + EI Asset | [`jnv/`](jnv/) | Active | JEE Mains + Advanced, NEET, JNVST selection test (2018), and EI Asset Test results for Jawahar Navodaya Vidyalaya students. → 4 tables: `jnv_fact_jee_results`, `jnv_fact_neet_results`, `jnv_fact_selection_test_results`, `jnv_fact_ei_asset_test_results`. |
+| JNV (entrance + board) | [`jnv/`](jnv/) | Active | JEE Mains + Advanced, NEET, JNVST selection test (2018), EI Asset Test, and CBSE 10th/12th board results for Jawahar Navodaya Vidyalaya students. → 6 tables: `jnv_fact_jee_results`, `jnv_fact_neet_results`, `jnv_fact_selection_test_results`, `jnv_fact_ei_asset_test_results`, `jnv_fact_board_results_10th`, `jnv_fact_board_results_12th`. |
 | UDISE+ (India) | [`udise/`](udise/) | Active | Unified District Information System for Education — school enrolment by state × management × category × location × class × gender, AY 2024-25 (dashboard export, reshaped wide→long). Parse → GCS → BQ → 1 `udise_fact_enrolment` table. |
 | Dakshana NCST | [`dakshana/`](dakshana/) | Active | Navodaya CoE Selection Test (NCST) results — scores, demographics, and coaching preferences for JNV students across 2022–2025. Conducted jointly by Dakshana Foundation, ENF, and Avanti. → 1 table: `dakshana_fact_ncst_results`. |
 | UBSE (Uttarakhand) | [`ubse/`](ubse/) | Active | Uttarakhand Board of School Education Grade 10 and Grade 12 board exam results (2026+). Long format — one row per student per subject. → 2 tables: `ubse_fact_grade10_results`, `ubse_fact_grade12_results`. |
-| Punjab SCERT | [`pb_scert/`](pb_scert/) | Active | SOE & RSMS Admission Test merit list for Punjab Schools of Eminence and Meritorious Schools (Class 11 admissions, AY 2024-25 to 2026-27, ~326k records). → 1 table: `pb_scert_soe_rsms_admission_merit_list`. |
+| Punjab SCERT | [`pb_scert/`](pb_scert/) | Active | SOE & RSMS Admission Test merit list for Punjab Schools of Eminence and Meritorious Schools (Class 11 admissions, AY 2024-25 to 2026-27, ~326k records). → 1 table: `pb_scert_fact_soe_rsms_admission_merit_list`. |
 
 All sources write into a single BigQuery dataset
 `avantifellows.external_data_sources` (region `asia-south1`), with tables

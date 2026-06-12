@@ -6,7 +6,7 @@ description: >
   Source: "SOE & RSMS Admission Test Merit List_ 2024-26 (3 years).xlsx"
 
 grain: (academic_year, exam_application_no)
-bq_table: pb_scert_soe_rsms_admission_merit_list
+bq_table: pb_scert_fact_soe_rsms_admission_merit_list
 source_files:
   single: "SOE & RSMS Admission Test Merit List_ 2024-26 (3 years).xlsx (sheet: Student List)"
 

@@ -1,27 +1,36 @@
 #!/usr/bin/env python3
 """
-Upload JNV JEE and NEET data to GCS.
+Upload all JNV data to GCS.
+
+Default (no flags) uploads all six pipelines — raw Excel as parquet + clean CSV as parquet.
 
 Uploads:
-  - Raw mains:    each JEE Mains Excel → parquet
-        gs://avantifellows-external-data/jnv/raw/jee_mains/<stem>.parquet
-  - Raw advanced: each JEE Advanced Excel → parquet
-        gs://avantifellows-external-data/jnv/raw/jee_advanced/<stem>.parquet
-  - Raw NEET:     each NEET Excel → parquet
-        gs://avantifellows-external-data/jnv/raw/neet/<stem>.parquet
-  - Clean JEE:    jee_clean.csv → parquet
-        gs://avantifellows-external-data/jnv/clean/jnv_fact_jee_results.parquet
-  - Clean NEET:   neet_clean.csv → parquet
-        gs://avantifellows-external-data/jnv/clean/jnv_fact_neet_results.parquet
+  - Raw mains:         jnv/raw/jee_mains/<stem>.parquet
+  - Raw advanced:      jnv/raw/jee_advanced/<stem>.parquet
+  - Raw NEET:          jnv/raw/neet/<stem>.parquet
+  - Raw JNVST:         jnv/raw/jnvst/<stem>.parquet
+  - Raw EI Asset Test: jnv/raw/ei_asset_test/<stem>.parquet
+  - Raw 10th board:    jnv/raw/board_results_10th/<stem>.parquet
+  - Raw 12th board:    jnv/raw/board_results_12th/<stem>.parquet
+  - Clean JEE:         jnv/clean/jnv_fact_jee_results.parquet
+  - Clean NEET:        jnv/clean/jnv_fact_neet_results.parquet
+  - Clean JNVST:       jnv/clean/jnv_fact_selection_test_results.parquet
+  - Clean EI Asset:    jnv/clean/jnv_fact_ei_asset_test_results.parquet
+  - Clean 10th board:  jnv/clean/jnv_fact_board_results_10th.parquet
+  - Clean 12th board:  jnv/clean/jnv_fact_board_results_12th.parquet
 
-Run clean_jee.py / clean_neet.py first to produce the clean CSVs.
+Run all clean scripts first to produce the clean CSVs before uploading.
 
 Usage:
-    python3 scripts/upload_to_gcs.py                    # upload all raw and clean
-    python3 scripts/upload_to_gcs.py --raw-only
-    python3 scripts/upload_to_gcs.py --clean-only
-    python3 scripts/upload_to_gcs.py --jee-only         # JEE raw + clean
-    python3 scripts/upload_to_gcs.py --neet-only        # NEET raw + clean
+    python3 scripts/upload_to_gcs.py                         # all raw + clean
+    python3 scripts/upload_to_gcs.py --raw-only              # all raw files
+    python3 scripts/upload_to_gcs.py --clean-only            # all clean files
+    python3 scripts/upload_to_gcs.py --jee-only
+    python3 scripts/upload_to_gcs.py --neet-only
+    python3 scripts/upload_to_gcs.py --jnvst-only
+    python3 scripts/upload_to_gcs.py --ei-asset-test-only
+    python3 scripts/upload_to_gcs.py --board-results-10th-only
+    python3 scripts/upload_to_gcs.py --board-results-12th-only
 """
 
 import argparse
@@ -74,8 +83,8 @@ def _upload_clean_table(client: storage.Client, table, apply_dtypes=None, clean_
 def main() -> None:
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group()
-    group.add_argument("--raw-only",   action="store_true", help="Upload raw files only (JEE + NEET)")
-    group.add_argument("--clean-only", action="store_true", help="Upload clean files only (JEE + NEET)")
+    group.add_argument("--raw-only",   action="store_true", help="Upload all raw files")
+    group.add_argument("--clean-only", action="store_true", help="Upload all clean files")
     group.add_argument("--jee-only",   action="store_true", help="Upload JEE raw + clean")
     group.add_argument("--neet-only",  action="store_true", help="Upload NEET raw + clean")
     group.add_argument("--jnvst-only",         action="store_true", help="Upload JNVST raw + clean")
@@ -90,9 +99,17 @@ def main() -> None:
         _upload_raw_files(client, RAW_MAINS_FILES, "mains")
         _upload_raw_files(client, RAW_ADV_FILES, "advanced")
         _upload_raw_files(client, RAW_NEET_FILES, "NEET")
+        _upload_raw_files(client, RAW_JNVST_FILES, "JNVST")
+        _upload_raw_files(client, RAW_EI_ASSET_TEST_FILES, "EI Asset Test")
+        _upload_raw_files(client, RAW_BOARD_RESULTS_10TH_FILES, "10th board results")
+        _upload_raw_files(client, RAW_BOARD_RESULTS_12TH_FILES, "12th board results")
     elif args.clean_only:
-        _upload_clean_table(client, JEE_CLEAN,   apply_dtypes_jee,  "clean_jee.py")
-        _upload_clean_table(client, NEET_CLEAN,  apply_dtypes_neet, "clean_neet.py")
+        _upload_clean_table(client, JEE_CLEAN,               apply_dtypes_jee,            "clean_jee.py")
+        _upload_clean_table(client, NEET_CLEAN,              apply_dtypes_neet,           "clean_neet.py")
+        _upload_clean_table(client, JNVST_CLEAN,             apply_dtypes_jnvst,          "clean_jnvst.py")
+        _upload_clean_table(client, EI_ASSET_TEST_CLEAN,     apply_dtypes_ei_asset_test,  "clean_ei_asset_test.py")
+        _upload_clean_table(client, BOARD_RESULTS_10TH_CLEAN, None,                       "clean_board_results_10th.py")
+        _upload_clean_table(client, BOARD_RESULTS_12TH_CLEAN, None,                       "clean_board_results_12th.py")
     elif args.jee_only:
         _upload_raw_files(client, RAW_MAINS_FILES, "mains")
         _upload_raw_files(client, RAW_ADV_FILES, "advanced")
@@ -116,8 +133,16 @@ def main() -> None:
         _upload_raw_files(client, RAW_MAINS_FILES, "mains")
         _upload_raw_files(client, RAW_ADV_FILES, "advanced")
         _upload_raw_files(client, RAW_NEET_FILES, "NEET")
-        _upload_clean_table(client, JEE_CLEAN,  apply_dtypes_jee,  "clean_jee.py")
-        _upload_clean_table(client, NEET_CLEAN, apply_dtypes_neet, "clean_neet.py")
+        _upload_raw_files(client, RAW_JNVST_FILES, "JNVST")
+        _upload_raw_files(client, RAW_EI_ASSET_TEST_FILES, "EI Asset Test")
+        _upload_raw_files(client, RAW_BOARD_RESULTS_10TH_FILES, "10th board results")
+        _upload_raw_files(client, RAW_BOARD_RESULTS_12TH_FILES, "12th board results")
+        _upload_clean_table(client, JEE_CLEAN,               apply_dtypes_jee,            "clean_jee.py")
+        _upload_clean_table(client, NEET_CLEAN,              apply_dtypes_neet,           "clean_neet.py")
+        _upload_clean_table(client, JNVST_CLEAN,             apply_dtypes_jnvst,          "clean_jnvst.py")
+        _upload_clean_table(client, EI_ASSET_TEST_CLEAN,     apply_dtypes_ei_asset_test,  "clean_ei_asset_test.py")
+        _upload_clean_table(client, BOARD_RESULTS_10TH_CLEAN, None,                       "clean_board_results_10th.py")
+        _upload_clean_table(client, BOARD_RESULTS_12TH_CLEAN, None,                       "clean_board_results_12th.py")
 
     print("\nDone.")
 

@@ -39,7 +39,7 @@ class Table:
 
 
 MERIT_LIST_CLEAN = Table(
-    name="pb_scert_soe_rsms_admission_merit_list",
+    name="pb_scert_fact_soe_rsms_admission_merit_list",
     local_path=PB_SCERT_DIR / "clean" / "merit_list_clean.csv",
 )
 

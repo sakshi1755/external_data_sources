@@ -6,7 +6,7 @@ Reads:
     gs://avantifellows-external-data/pb_scert/clean/pb_scert_fact_admission_merit_list.parquet
 
 Writes (WRITE_TRUNCATE):
-    avantifellows.external_data_sources.pb_scert_soe_rsms_admission_merit_list
+    avantifellows.external_data_sources.pb_scert_fact_soe_rsms_admission_merit_list
 
 Run upload_to_gcs.py first.
 

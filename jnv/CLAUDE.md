@@ -8,9 +8,9 @@ All paths in this file are relative to `jnv/` unless otherwise noted.
 ## What this folder is
 
 A transform + ingestion pipeline for JEE Mains, JEE Advanced, NEET, JNVST
-selection test, and EI Asset Test results of JNV (Jawahar Navodaya Vidyalaya)
-students. Source data is raw Excel files received from NTA / internal JNV
-tracking, one file per year per exam.
+selection test, EI Asset Test, and CBSE board results of JNV (Jawahar Navodaya
+Vidyalaya) students. Source data is raw Excel files received from NTA / CBSE /
+internal JNV tracking, one file per year per exam.
 
 - **JEE pipeline** — 2021 through 2026. Schema aligned with production dbt
   model `fact_student_jee_main_results`.
@@ -20,6 +20,12 @@ tracking, one file per year per exam.
   cleaning (column renames, area/gender value mapping).
 - **EI Asset Test pipeline** — EI ASSET assessment scores by student and
   subject. Raw load with column renames only.
+- **Board Results 10th pipeline** — CBSE 10th board results, 2022–2025. Long
+  format (one row per student per subject), unpivoted from up to 7 subject
+  slots per student.
+- **Board Results 12th pipeline** — CBSE 12th board results, 2022–2025. Long
+  format, includes both main subjects (with marks) and internal assessment
+  subjects (grade only — Work Experience, Health & PE, General Studies).
 
 This is the **heavy transform** template — contrast with
 [`nirf/`](../nirf/CLAUDE.md) which is a thin pass-through. The clean step
@@ -105,6 +111,44 @@ gs://avantifellows-external-data/
 avantifellows.external_data_sources.jnv_fact_ei_asset_test_results  (asia-south1)
 ```
 
+**Board Results 10th pipeline:**
+```
+raw/board_results_10th/*.xlsx (local Excel files, gitignored)
+       │
+       │  scripts/clean_board_results_10th.py  (wide → long unpivot, column renames)
+       ▼
+clean/board_results_10th_clean.csv
+       │
+       │  scripts/upload_to_gcs.py --board-results-10th-only
+       ▼
+gs://avantifellows-external-data/
+  jnv/raw/board_results_10th/<stem>.parquet
+  jnv/clean/jnv_fact_board_results_10th.parquet
+       │
+       │  scripts/load_bq.py --board-results-10th-only
+       ▼
+avantifellows.external_data_sources.jnv_fact_board_results_10th  (asia-south1)
+```
+
+**Board Results 12th pipeline:**
+```
+raw/board_results_12th/*.xlsx (local Excel files, gitignored)
+       │
+       │  scripts/clean_board_results_12th.py  (wide → long unpivot, column renames)
+       ▼
+clean/board_results_12th_clean.csv
+       │
+       │  scripts/upload_to_gcs.py --board-results-12th-only
+       ▼
+gs://avantifellows-external-data/
+  jnv/raw/board_results_12th/<stem>.parquet
+  jnv/clean/jnv_fact_board_results_12th.parquet
+       │
+       │  scripts/load_bq.py --board-results-12th-only
+       ▼
+avantifellows.external_data_sources.jnv_fact_board_results_12th  (asia-south1)
+```
+
 **Single source of truth for pipeline config: [`scripts/sources.py`](scripts/sources.py).**
 It declares the GCS bucket/prefix, BQ destination, all clean table
 definitions, and the list of raw Excel files + primary sheets for every
@@ -162,9 +206,29 @@ python3 -m venv .venv
 # 3. Load clean parquet from GCS → BigQuery
 .venv/bin/python scripts/load_bq.py --ei-asset-test-only
 
-# ── JEE + NEET at once ────────────────────────────────────────────────────────
-.venv/bin/python scripts/upload_to_gcs.py   # upload JEE + NEET raw + clean
-.venv/bin/python scripts/load_bq.py         # load JEE + NEET tables
+# ── Board Results 10th pipeline ───────────────────────────────────────────────
+# 1. Clean raw Excel → CSV (wide → long unpivot, column renames)
+.venv/bin/python scripts/clean_board_results_10th.py
+
+# 2. Upload raw Excel (as parquet) + clean CSV (as parquet) to GCS
+.venv/bin/python scripts/upload_to_gcs.py --board-results-10th-only
+
+# 3. Load clean parquet from GCS → BigQuery
+.venv/bin/python scripts/load_bq.py --board-results-10th-only
+
+# ── Board Results 12th pipeline ───────────────────────────────────────────────
+# 1. Clean raw Excel → CSV (wide → long unpivot, column renames)
+.venv/bin/python scripts/clean_board_results_12th.py
+
+# 2. Upload raw Excel (as parquet) + clean CSV (as parquet) to GCS
+.venv/bin/python scripts/upload_to_gcs.py --board-results-12th-only
+
+# 3. Load clean parquet from GCS → BigQuery
+.venv/bin/python scripts/load_bq.py --board-results-12th-only
+
+# ── All six pipelines at once ─────────────────────────────────────────────────
+.venv/bin/python scripts/upload_to_gcs.py   # upload all raw + clean
+.venv/bin/python scripts/load_bq.py         # load all six tables
 ```
 
 One-time GCP prerequisites:
@@ -203,13 +267,19 @@ bq --location=asia-south1 mk --dataset avantifellows:external_data_sources
 | `scripts/clean_neet.py` | Yes | NEET transform engine: codemap-driven → clean CSV. |
 | `scripts/clean_jnvst.py` | Yes | JNVST clean: column renames + area/gender value mapping → CSV. |
 | `scripts/clean_ei_asset_test.py` | Yes | EI Asset Test clean: column renames → CSV. |
+| `scripts/clean_board_results_10th.py` | Yes | 10th board results: wide → long unpivot → CSV. |
+| `scripts/clean_board_results_12th.py` | Yes | 12th board results: wide → long unpivot → CSV. |
+| `raw/board_results_10th/*.xlsx` | No | Source CBSE 10th board Excel files per year. Gitignored. |
+| `raw/board_results_12th/*.xlsx` | No | Source CBSE 12th board Excel files per year. Gitignored. |
+| `clean/board_results_10th_clean.csv` | No | Output of `clean_board_results_10th.py`. Gitignored. |
+| `clean/board_results_12th_clean.csv` | No | Output of `clean_board_results_12th.py`. Gitignored. |
 | `scripts/upload_to_gcs.py` | Yes | Converts Excel + CSV → parquet, uploads to GCS (all pipelines). |
 | `scripts/load_bq.py` | Yes | Loads clean parquet from GCS → BQ (WRITE_TRUNCATE). All pipelines. |
 | `schemas/` | Yes | YAML column documentation for BQ tables. |
 
 ## BQ schema
 
-Four tables in `avantifellows.external_data_sources`:
+Six tables in `avantifellows.external_data_sources`:
 
 | Table | Grain | ~Rows |
 |---|---|---:|
@@ -217,6 +287,8 @@ Four tables in `avantifellows.external_data_sources`:
 | `jnv_fact_neet_results` | (test_year, application_no) | ~114k |
 | `jnv_fact_selection_test_results` | (district_rank, roll_no) | ~46k |
 | `jnv_fact_ei_asset_test_results` | (id) | ~1.6k |
+| `jnv_fact_board_results_10th` | (exam_year, roll_number, subject_code) | ~3.6M |
+| `jnv_fact_board_results_12th` | (exam_year, roll_number, subject_code) | ~2.5M |
 
 Key column groups (full list in [`codemaps/mains/shared.py`](codemaps/mains/shared.py)):
 

@@ -1,21 +1,33 @@
 #!/usr/bin/env python3
 """
-Load JNV JEE and NEET clean data from GCS into BigQuery.
+Load all JNV clean data from GCS into BigQuery.
 
-Reads:
+Reads (all six tables by default):
     gs://avantifellows-external-data/jnv/clean/jnv_fact_jee_results.parquet
     gs://avantifellows-external-data/jnv/clean/jnv_fact_neet_results.parquet
+    gs://avantifellows-external-data/jnv/clean/jnv_fact_selection_test_results.parquet
+    gs://avantifellows-external-data/jnv/clean/jnv_fact_ei_asset_test_results.parquet
+    gs://avantifellows-external-data/jnv/clean/jnv_fact_board_results_10th.parquet
+    gs://avantifellows-external-data/jnv/clean/jnv_fact_board_results_12th.parquet
 
 Writes (WRITE_TRUNCATE):
     avantifellows.external_data_sources.jnv_fact_jee_results
     avantifellows.external_data_sources.jnv_fact_neet_results
+    avantifellows.external_data_sources.jnv_fact_selection_test_results
+    avantifellows.external_data_sources.jnv_fact_ei_asset_test_results
+    avantifellows.external_data_sources.jnv_fact_board_results_10th
+    avantifellows.external_data_sources.jnv_fact_board_results_12th
 
 Run upload_to_gcs.py first to ensure the GCS files are up to date.
 
 Usage:
-    python3 scripts/load_bq.py              # load both JEE and NEET
+    python3 scripts/load_bq.py                      # load all six tables
     python3 scripts/load_bq.py --jee-only
     python3 scripts/load_bq.py --neet-only
+    python3 scripts/load_bq.py --jnvst-only
+    python3 scripts/load_bq.py --ei-asset-test-only
+    python3 scripts/load_bq.py --board-results-10th-only
+    python3 scripts/load_bq.py --board-results-12th-only
 """
 
 import argparse
@@ -71,6 +83,10 @@ def main() -> None:
     else:
         _load(client, JEE_CLEAN)
         _load(client, NEET_CLEAN)
+        _load(client, JNVST_CLEAN)
+        _load(client, EI_ASSET_TEST_CLEAN)
+        _load(client, BOARD_RESULTS_10TH_CLEAN)
+        _load(client, BOARD_RESULTS_12TH_CLEAN)
 
     print("\nDone.")
 

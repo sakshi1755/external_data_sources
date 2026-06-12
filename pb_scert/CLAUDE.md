@@ -25,11 +25,11 @@ clean/merit_list_clean.csv
        ▼
 gs://avantifellows-external-data/
   pb_scert/raw/soe_&_rsms_admission_test_merit_list__2024-26_(3_years).parquet
-  pb_scert/clean/pb_scert_soe_rsms_admission_merit_list.parquet
+  pb_scert/clean/pb_scert_fact_soe_rsms_admission_merit_list.parquet
        │
        │  scripts/load_bq.py
        ▼
-avantifellows.external_data_sources.pb_scert_soe_rsms_admission_merit_list  (asia-south1)
+avantifellows.external_data_sources.pb_scert_fact_soe_rsms_admission_merit_list  (asia-south1)
 ```
 
 ## Commands
@@ -69,7 +69,7 @@ One table in `avantifellows.external_data_sources`:
 
 | Table | Grain | ~Rows |
 |---|---|---:|
-| `pb_scert_soe_rsms_admission_merit_list` | (academic_year, exam_application_no) | ~326k |
+| `pb_scert_fact_soe_rsms_admission_merit_list` | (academic_year, exam_application_no) | ~326k |
 
 ## Key column groups
 

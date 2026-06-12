@@ -3,11 +3,13 @@
 JEE Mains/Advanced, NEET, JNVST selection test, and EI Asset Test results for
 Jawahar Navodaya Vidyalaya (JNV) students.
 
-Produces four BigQuery tables:
+Produces six BigQuery tables:
 - `avantifellows.external_data_sources.jnv_fact_jee_results` (2021–2026)
 - `avantifellows.external_data_sources.jnv_fact_neet_results` (2021–2025)
 - `avantifellows.external_data_sources.jnv_fact_selection_test_results` (2018)
 - `avantifellows.external_data_sources.jnv_fact_ei_asset_test_results`
+- `avantifellows.external_data_sources.jnv_fact_board_results_10th` (2022–2025)
+- `avantifellows.external_data_sources.jnv_fact_board_results_12th` (2022–2025)
 
 See [`CLAUDE.md`](CLAUDE.md) for full pipeline orientation, design decisions, and pitfalls.
 
@@ -79,6 +81,25 @@ python3 -m venv .venv
 .venv/bin/python scripts/load_bq.py --ei-asset-test-only
 ```
 
+## Quick start — Board Results (10th / 12th)
+
+```bash
+# 1. Drop raw Excel files into raw/board_results_10th/ and raw/board_results_12th/
+#    (filenames must match sources.py → RAW_BOARD_RESULTS_10TH_FILES / RAW_BOARD_RESULTS_12TH_FILES)
+
+# 2. Clean → CSV (wide → long unpivot, column renames)
+.venv/bin/python scripts/clean_board_results_10th.py
+.venv/bin/python scripts/clean_board_results_12th.py
+
+# 3. Upload raw (as parquet) + clean (as parquet) to GCS
+.venv/bin/python scripts/upload_to_gcs.py --board-results-10th-only
+.venv/bin/python scripts/upload_to_gcs.py --board-results-12th-only
+
+# 4. Load clean parquet from GCS → BigQuery
+.venv/bin/python scripts/load_bq.py --board-results-10th-only
+.venv/bin/python scripts/load_bq.py --board-results-12th-only
+```
+
 ## Output
 
 | Table | Grain | ~Rows |
@@ -87,6 +108,8 @@ python3 -m venv .venv
 | `jnv_fact_neet_results` | (test_year, application_no) | ~114k |
 | `jnv_fact_selection_test_results` | (district_rank, roll_no) | ~46k |
 | `jnv_fact_ei_asset_test_results` | (id) | ~1.6k |
+| `jnv_fact_board_results_10th` | (exam_year, roll_number, subject_code) | ~3.6M |
+| `jnv_fact_board_results_12th` | (exam_year, roll_number, subject_code) | ~2.5M |
 
 ## Adding a new JEE year
 
@@ -111,8 +134,12 @@ gs://avantifellows-external-data/
   jnv/raw/neet/<stem>.parquet                 ← one per raw NEET Excel
   jnv/raw/jnvst/<stem>.parquet                ← raw JNVST Excel
   jnv/raw/ei_asset_test/<stem>.parquet        ← raw EI Asset Test Excel
+  jnv/raw/board_results_10th/<stem>.parquet   ← one per raw 10th board Excel
+  jnv/raw/board_results_12th/<stem>.parquet   ← one per raw 12th board Excel
   jnv/clean/jnv_fact_jee_results.parquet
   jnv/clean/jnv_fact_neet_results.parquet
   jnv/clean/jnv_fact_selection_test_results.parquet
   jnv/clean/jnv_fact_ei_asset_test_results.parquet
+  jnv/clean/jnv_fact_board_results_10th.parquet
+  jnv/clean/jnv_fact_board_results_12th.parquet
 ```

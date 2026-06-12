@@ -6,7 +6,7 @@ Uploads:
   - Raw Excel as parquet:
       gs://avantifellows-external-data/pb_scert/raw/<stem>.parquet
   - Clean CSV as parquet:
-      gs://avantifellows-external-data/pb_scert/clean/pb_scert_soe_rsms_admission_merit_list.parquet
+      gs://avantifellows-external-data/pb_scert/clean/pb_scert_fact_soe_rsms_admission_merit_list.parquet
 
 Run clean_merit_list.py first.
 
