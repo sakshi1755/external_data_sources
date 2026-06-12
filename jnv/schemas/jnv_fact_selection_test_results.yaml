@@ -5,7 +5,7 @@ description: >
 
 grain: (district_rank, roll_no)
 source_files:
-  2018: JNVST 2018 11-09-2025.xlsx  (sheet: JNVST 2018)
+  2018: "JNVST 2018 11-09-2025.xlsx  (sheet: JNVST 2018)"
 
 columns:
   - name: test_year
@@ -22,7 +22,7 @@ columns:
 
   - name: centre_no
     type: int
-    description: Exam centre number. Hierarchy: state → district → block → centre.
+    description: "Exam centre number. Hierarchy: state → district → block → centre."
 
   - name: roll_no
     type: str
