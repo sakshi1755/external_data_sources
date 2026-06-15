@@ -1,9 +1,15 @@
 description: >
   Navodaya CoE Selection Test (NCST) results for students across 2022–2025.
-  NCST is conducted jointly by Dakshana Foundation, Ex-Navodaya Foundation (ENF),
-  and Avanti Foundation to select JNV students for coaching programmes.
+  In these years, NCST was conducted jointly by Dakshana Foundation,
+  Ex-Navodaya Foundation (ENF), and Avanti Foundation as a Dakshana-curated
+  process to select JNV students for coaching programmes.
   Includes effective scores (after penalty), demographic details, and coaching
   preferences. Contact columns (mobile, email) are excluded.
+
+  Note: 2026 onward is a separate table — nvs_fact_ncst_results — because
+  from 2026 NCST was conducted at national scale by NVS directly (not
+  Dakshana-administered). The first 27 columns in nvs_fact_ncst_results
+  match this schema exactly to enable cross-year SQL UNIONs.
 
 grain: (test_year, roll_no)
 
