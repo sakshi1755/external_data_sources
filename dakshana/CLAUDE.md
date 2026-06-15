@@ -8,10 +8,15 @@ All paths in this file are relative to `dakshana/` unless otherwise noted.
 ## What this folder is
 
 A transform + ingestion pipeline for NCST (Navodaya CoE Selection Test)
-results. NCST is conducted jointly by Dakshana Foundation, Ex-Navodaya
-Foundation (ENF), and Avanti Foundation to select JNV students for
-two-year IIT/NEET coaching programmes. Source data is one Excel file per
-year (2022–2025).
+results for **2022–2025**. In these years, NCST was conducted jointly by
+Dakshana Foundation, Ex-Navodaya Foundation (ENF), and Avanti Foundation
+as a smaller, Dakshana-curated process to select JNV students for two-year
+IIT/NEET coaching programmes. Source data is one Excel file per year.
+
+**2026 and later years live in [`nvs/`](../nvs/)**, not here. From 2026,
+NCST was conducted at national scale by NVS directly (Dakshana set the
+question paper but did not administer the exam). The 2026 data covers ~43k
+students with a much richer schema and belongs to a separate source.
 
 Each file carries student scores (effective after penalty), coaching
 preferences, and demographic details. Contact columns (mobile, email) are
