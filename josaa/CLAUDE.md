@@ -45,13 +45,13 @@ One table in `avantifellows.external_data_sources`:
 
 | Table | Rows | Grain | Clustering |
 |---|---:|---|---|
-| `josaa_fact_cutoffs` | ~523k | (institute, program, quota, seat_type, gender, year, round) | year, round, seat_type |
+| `josaa_fact_cutoffs` | 464,496 | (institute, program, quota, seat_type, gender, year, round) | year, round, seat_type |
 
 Authoritative column docs: [`schemas/josaa_fact_cutoffs.yaml`](schemas/josaa_fact_cutoffs.yaml).
 
 ## Design decisions worth knowing before changing them
 
-- **All rounds, not just final.** The fact is the full per-round union (~523k
+- **All rounds, not just final.** The fact is the full per-round union (464,496
   rows) with `round` as a real dimension. Final-round / MAX-closing views are
   analyst derivations computed downstream, not extra tables here.
 - **Ranks are INTEGER, prep is a flag.** JoSAA's trailing-`P` preparatory

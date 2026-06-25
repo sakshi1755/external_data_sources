@@ -2,7 +2,7 @@
 
 JoSAA (Joint Seat Allocation Authority) engineering seat-allotment cutoffs —
 opening and closing ranks for every IIT/NIT/IIIT/GFTI seat bucket, every
-counselling round, 2016 → latest. ~523k rows.
+counselling round, 2016 → latest. 464,496 rows.
 
 New here? Read [`schemas/README.md`](schemas/README.md) — "JoSAA in 60 seconds"
 — before querying. Pipeline orientation for editing is in [`CLAUDE.md`](CLAUDE.md).
@@ -71,6 +71,6 @@ python3 -m venv .venv
 
 | Table | Grain | Rows | Clustering |
 |---|---|---:|---|
-| `josaa_fact_cutoffs` | (institute, program, quota, seat_type, gender, year, round) | ~523k | year, round, seat_type |
+| `josaa_fact_cutoffs` | (institute, program, quota, seat_type, gender, year, round) | 464,496 | year, round, seat_type |
 
 Column docs: [`schemas/josaa_fact_cutoffs.yaml`](schemas/josaa_fact_cutoffs.yaml).

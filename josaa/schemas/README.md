@@ -53,6 +53,6 @@ candidate allotted = the **cutoff**).
 
 | Table | Grain | Rows |
 |---|---|---:|
-| `josaa_fact_cutoffs` | (institute, program, quota, seat_type, gender, year, round) | ~523k |
+| `josaa_fact_cutoffs` | (institute, program, quota, seat_type, gender, year, round) | 464,496 |
 
 Column-level docs: [`josaa_fact_cutoffs.yaml`](josaa_fact_cutoffs.yaml).

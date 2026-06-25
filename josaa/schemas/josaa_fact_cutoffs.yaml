@@ -6,7 +6,7 @@
 description: |
   JoSAA seat-allotment cutoffs — the opening and closing rank for every
   (institute, program, quota, category, gender) seat bucket, in every
-  counselling round, every year (2016 → latest). ~523k rows.
+  counselling round, every year (2016 → latest). 464,496 rows.
 
   WHAT JoSAA IS. JoSAA (Joint Seat Allocation Authority) runs the single
   centralized admission counselling for India's centrally-funded engineering
@@ -53,7 +53,7 @@ description: |
      (institute, academic_program_name, quota, seat_type, gender, year).
      Do NOT just filter round = 5 — round counts vary (5 to 7) by year.
 
-rows: ~460000
+rows: 464496
 grain: (institute, academic_program_name, quota, seat_type, gender, year, round)
 
 columns:
